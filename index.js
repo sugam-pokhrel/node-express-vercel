@@ -43,7 +43,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 // POST endpoint to save a notice with image
-app.post('/notices', async (req, res) => {
+app.post('/notices', upload.single('image'), async (req, res) => {
   try {
     // Check if req.file is defined
     if (!req.file) {
@@ -51,23 +51,25 @@ app.post('/notices', async (req, res) => {
     }
 
     const formData = new FormData();
-    formData.append('image', req.file.buffer.toString('base64'));
+    formData.append('image', req.file.buffer, { filename: req.file.originalname });
+
     const imgbbResponse = await axios.post('https://api.imgbb.com/1/upload?key=a411ad4e427132ef4f1c461965031b2c', formData, {
       headers: formData.getHeaders(),
     });
+
     const imageUrl = imgbbResponse.data.data.url;
-    console.log('Image uploaded to imgbb:', imageUrl)
+    console.log('Image uploaded to imgbb:', imageUrl);
 
     // Create notice document
     const notice = new Notice({
       title: req.body.title,
-      desc: req.body.description,
-      imageUrl: req.body.image,
+      description: req.body.description,
+      imageUrl: imageUrl,
     });
 
     // Save notice to MongoDB
     await notice.save();
-    console.log('Notice saved to MongoDB:', notice)
+    console.log('Notice saved to MongoDB:', notice);
 
     res.status(201).json({ message: 'Notice saved successfully', notice });
   } catch (error) {
