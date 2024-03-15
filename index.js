@@ -41,7 +41,18 @@ const Notice = mongoose.model('Notice', noticeSchema);
 // Multer configuration for file upload
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
+app.get('/notices', async (req, res) => {
+  try {
+    // Query MongoDB for all notices and sort them in ascending order by createdAt
 
+    const notices = await Notice.find().sort({ createdAt: 1 });
+    // Return the notices as JSON response
+    res.json(notices.reverse());
+  } catch (error) {
+    console.error('Error fetching notices:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 // POST endpoint to save a notice with image
 app.post('/notices',  async (req, res) => {
   try {
