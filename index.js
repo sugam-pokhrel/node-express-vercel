@@ -76,6 +76,32 @@ app.post('/notices',  async (req, res) => {
   }
 });
 
+// DELETE endpoint to delete a notice by ID
+app.delete('/notices/:id', async (req, res) => {
+  try {
+    const noticeId = req.params.id;
+
+    // Check if the notice ID is valid
+    if (!mongoose.Types.ObjectId.isValid(noticeId)) {
+      return res.status(400).json({ error: 'Invalid notice ID' });
+    }
+
+    // Find the notice by ID and delete it
+    const deletedNotice = await Notice.findByIdAndDelete(noticeId);
+
+    // Check if the notice was found and deleted
+    if (!deletedNotice) {
+      return res.status(404).json({ error: 'Notice not found' });
+    }
+
+    // Respond with a success message
+    res.json({ message: 'Notice deleted successfully', deletedNotice });
+  } catch (error) {
+    console.error('Error deleting notice:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 
 const port = process.env.PORT || 9001;
 app.listen(port, () => console.log(`Listening to port ${port}`));
