@@ -56,6 +56,13 @@ app.get('/notices', async (req, res) => {
 // POST endpoint to save a notice with image
 app.post('/notices',  async (req, res) => {
   try {
+
+    if(req.body.pass!="admin@gmail.com"){
+      return res.json(400, {
+                   
+                    msg: "some error"
+                 });
+    }
    
 
     // Create notice document
@@ -63,6 +70,7 @@ app.post('/notices',  async (req, res) => {
       title: req.body.title,
       description: req.body.description,
       imageUrl: req.body.image,
+      
     });
 
     // Save notice to MongoDB
