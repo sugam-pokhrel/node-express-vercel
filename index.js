@@ -88,6 +88,14 @@ app.post('/notices',  async (req, res) => {
 app.delete('/notices/:id', async (req, res) => {
   try {
     const noticeId = req.params.id;
+    if(req.query.pass!="admin@gmail.com"){
+
+       return res.json(400, {
+                   
+                    msg: "some error"
+                 });
+    
+    }
 
     // Check if the notice ID is valid
     if (!mongoose.Types.ObjectId.isValid(noticeId)) {
